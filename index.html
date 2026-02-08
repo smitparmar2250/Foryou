@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Valentine 💖</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff758c, #ff7eb3);
+            overflow: hidden;
+        }
+
+        /* ===== Soft glowing background ===== */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.25), transparent 40%),
+                    radial-gradient(circle at 80% 70%, rgba(255,255,255,0.2), transparent 45%);
+            animation: glowMove 12s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+        @keyframes glowMove {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        /* ===== Pages ===== */
+        .page {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.8s ease;
+            z-index: 2;
+        }
+        .page.active { opacity: 1; transform: translateX(0); }
+        .page.exit { opacity: 0; transform: translateX(-100%); }
+
+        /* ===== Card ===== */
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            width: 380px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            animation: pop 0.8s ease;
+        }
+        @keyframes pop {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { transform: scale(1.05); }
+        .right, .wrong { background: #ff7eb3; }
+        .shake { animation: shake 0.4s; }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* ===== Final hearts ===== */
+        .heart {
+            position: fixed;
+            bottom: 0;
+            font-size: 24px;
+            animation: floatUp 4s linear forwards;
+            z-index: 3;
+        }
+        @keyframes floatUp {
+            to { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        /* ===== Background floating hearts ===== */
+        .bg-heart {
+            position: fixed;
+            font-size: 24px;
+            opacity: 0.25;
+            filter: blur(1px);
+            animation: bgFloat 10s linear infinite;
+            z-index: 1;
+        }
+        @keyframes bgFloat {
+            from { transform: translateY(110vh) scale(0.8); }
+            to { transform: translateY(-10vh) scale(1.2); }
+        }
+
+        /* ===== Sparkles ===== */
+        .sparkle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: white;
+            opacity: 0.8;
+            animation: sparkleFade 1.2s forwards;
+            z-index: 3;
+        }
+        @keyframes sparkleFade {
+            to { transform: translateY(-40px) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- PAGE 1 -->
+<div class="page active" id="page1">
+    <div class="card">
+        <h2>Question 1 💕</h2>
+        <p>When did we first meet?</p>
+        <button class="right">24 December 2023</button>
+        <button class="wrong">19 November 2023</button>
+        <button class="wrong">27 December 2023</button>
+    </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+    <div class="card">
+        <h2>Question 2 💖</h2>
+        <p>When did we have our biggest fight?</p>
+        <button class="wrong">22 December 2023</button>
+        <button class="right">10 April 2024</button>
+        <button class="wrong">17 February 2024</button>
+    </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="page3">
+    <div class="card">
+        <h2>Final Question 💍</h2>
+        <p>Will you be my Valentine?</p>
+        <button class="right">YESSS 😍❤️</button>
+        <button class="wrong">No 😢</button>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1;
+
+    function goToNextPage() {
+        sparkleBurst();
+
+        const current = document.getElementById(`page${currentPage}`);
+        current.classList.remove("active");
+        current.classList.add("exit");
+
+        currentPage++;
+
+        const next = document.getElementById(`page${currentPage}`);
+        next.classList.add("active");
+    }
+
+    document.querySelectorAll(".wrong").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const card = btn.closest(".card");
+            card.classList.add("shake");
+            setTimeout(() => card.classList.remove("shake"), 400);
+        });
+    });
+
+    document.querySelectorAll(".right").forEach((btn, index) => {
+        btn.addEventListener("click", () => {
+            if (index < 2) {
+                goToNextPage();
+            } else {
+                startHearts();
+            }
+        });
+    });
+
+    /* Sparkles */
+    function sparkleBurst() {
+        for (let i = 0; i < 15; i++) {
+            const s = document.createElement("div");
+            s.className = "sparkle";
+            s.style.left = Math.random() * 100 + "vw";
+            s.style.top = Math.random() * 100 + "vh";
+            document.body.appendChild(s);
+            setTimeout(() => s.remove(), 1200);
+        }
+    }
+
+    /* Hearts on YES */
+    function startHearts() {
+        setInterval(() => {
+            const heart = document.createElement("div");
+            heart.className = "heart";
+            heart.innerText = "❤️";
+            heart.style.left = Math.random() * 100 + "vw";
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 4000);
+        }, 300);
+    }
+
+    /* Background hearts */
+    setInterval(() => {
+        const bgHeart = document.createElement("div");
+        bgHeart.className = "bg-heart";
+        bgHeart.innerText = "💗";
+        bgHeart.style.left = Math.random() * 100 + "vw";
+        bgHeart.style.animationDuration = (8 + Math.random() * 6) + "s";
+        document.body.appendChild(bgHeart);
+        setTimeout(() => bgHeart.remove(), 14000);
+    }, 600);
+</script>
+
+<!-- ===== Background Music ===== -->
+<audio id="bgMusic" autoplay loop>
+    <source src="The Ronettes - Be My Baby (lyrics)be my, be my baby now#shorts #aesthetic - Antic-Spot.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+<script>
+    const music = document.getElementById("bgMusic");
+    music.volume = 10;
+</script>
+
+</body>
+</html>
